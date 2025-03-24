@@ -1,0 +1,24 @@
+version: '3.8'
+
+services:
+  envoy:
+    image: envoyproxy/envoy:v1.28-latest
+    ports:
+      - "10000:10000"  # Front envoy
+      - "9901:9901"    # Admin interface
+    volumes:
+      - ./config/envoy.yaml:/etc/envoy/envoy.yaml
+      - ./target/wasm:/wasm
+    networks:
+      - envoy-net
+    depends_on:
+      - backend
+
+  backend:
+    image: kennethreitz/httpbin
+    networks:
+      - envoy-net
+
+networks:
+  envoy-net:
+    driver: bridge
